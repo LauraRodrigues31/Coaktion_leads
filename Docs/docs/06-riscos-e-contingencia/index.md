@@ -4,31 +4,28 @@ sidebar_position: 1
 
 # Riscos e Contingência
 
-## Decisão em aberto: lockdown / modo kiosk
+## Decisão resolvida: lockdown / modo kiosk
 
-Esta é a decisão técnica mais importante ainda pendente do projeto, e
-depende de uma resposta da contratante:
+A contratante confirmou como o totem vai operar: sempre com alguém da
+equipe de marketing por perto. O fluxo real é assistido de ponta a
+ponta — a pessoa completa o formulário, vê a tela final onde escolhe
+prêmios (há uma ativação de comida com 4 carrinhos, e a pessoa ganha um
+voucher para escolher duas opções), e depois alguém da equipe aperta um
+botão de "recomeçar", já existente no fluxo da própria LP, que volta
+para a tela inicial para atender a próxima pessoa da fila.
 
-> **O totem vai ter sempre alguém da equipe de marketing supervisionando,
-> ou ele fica sozinho captando lead sem ninguém por perto?**
-
-Essa resposta define qual nível de bloqueio de tela é necessário — e o
-nível de bloqueio, por sua vez, afeta qual das duas opções de arquitetura
-(ver [Arquitetura Técnica](/arquitetura-tecnica)) faz sentido. Por isso
-essa árvore de decisão **não está resolvida aqui** — está documentada
-para ser decidida junto com a contratante.
-
-### Se o totem for sempre supervisionado
-
-Nenhum lockdown de sistema é estritamente necessário. Basta o
-**Immersive Mode** (modo fullscreen nativo do Android, gratuito) para
-reduzir saídas acidentais da tela do formulário.
+Como o reset entre atendimentos é manual, acionado por humano, e o
+totem nunca fica sozinho, **nenhum bloqueio de sistema é necessário** —
+nem Fully Kiosk Browser, nem Device Owner/Lock Task mode. O totem roda
+em modo normal do Chrome Android. Um fullscreen simples (Immersive
+Mode, nativo e gratuito) é opcional, não obrigatório.
 
 A foto abaixo é de um totem físico do mesmo formato/hardware, em
 operação real, rodando **sem nenhum lockdown nem fullscreen** — a barra
-de status do Android fica visível no topo. Ou seja: já existe prova de
-que esse tipo de solução funciona mesmo sem nenhuma trava de sistema,
-desde que haja supervisão humana por perto.
+de status do Android fica visível no topo. Ela é consistente com a
+operação confirmada: esse tipo de solução funciona normalmente sem
+nenhuma trava de sistema, desde que haja supervisão humana por perto,
+como será o caso aqui.
 
 ![Totem de referência em operação, orientação retrato, barra de status do Android visível no topo — sem lockdown](/img/totem-exemplo.jpeg)
 
@@ -36,30 +33,19 @@ desde que haja supervisão humana por perto.
 retrato e a barra de status do Android visível — evidência de que a
 solução roda hoje sem nenhuma trava de sistema.*
 
-### Se o totem ficar sem supervisão constante
-
-Duas alternativas, cada uma amarrada a uma das opções de arquitetura:
-
-- **Fully Kiosk Browser** (Opção 1 — PWA): app de terceiros que trava a
-  tela no formulário. Custo aproximado de R$45–70 por licença, para os
-  dois totens. Não exige resetar o tablet de fábrica.
-- **Device Owner + Lock Task mode** (Opção 2 — Capacitor): bloqueio
-  nativo do Android, mais robusto que o Fully Kiosk Browser, mas exige
-  resetar o tablet de fábrica para provisionar — e só é viável se isso
-  puder ser feito antes do evento.
-
-**Pendência:** confirmar com a contratante se será possível fazer reset
-de fábrica dos tablets, caso o caminho do Device Owner seja necessário.
-Enquanto essa resposta não vem, a Opção 1 (PWA + Fully Kiosk Browser
-condicional) segue como recomendação, por não depender dessa
-possibilidade.
+Essa decisão também simplifica a arquitetura: a Opção 1 (PWA + Dexie.js)
+resolve o projeto sozinha, sem precisar de nenhuma camada extra de
+lockdown. A Opção 2 (Capacitor) continua documentada e tecnicamente
+disponível em [Arquitetura Técnica](/arquitetura-tecnica), mas não por
+motivo de lockdown — só se a contratante preferir um app nativo
+instalável por outras razões, agora ou em eventos futuros.
 
 ## Outros riscos
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
 | Wi-Fi não disponível no fim do evento para a sincronização final | Leads capturados ficam presos no totem | Botão de exportação manual em CSV para backup via pendrive, além do botão de "sincronizar agora" assim que houver conexão |
-| Hardware ligado continuamente por ~2 dias de evento | Travamento, lentidão ou reinício inesperado do tablet perdendo estado da sessão | Persistência imediata de cada resposta no armazenamento local (Dexie/IndexedDB), reset automático por inatividade, e checagem de estabilidade nos testes em hardware físico antes do evento |
+| Hardware ligado continuamente por ~2 dias de evento | Travamento, lentidão ou reinício inesperado do tablet perdendo estado da sessão | Persistência imediata de cada resposta no armazenamento local (Dexie/IndexedDB) e checagem de estabilidade nos testes em hardware físico antes do evento |
 | Rebuild/reexport do código no Lovable depois que o service worker já estiver configurado | Nova versão da LP ir para o totem sem passar pela camada offline, quebrando o cache ou perdendo o ajuste offline | Processo definido de que todo novo build do Lovable passa pela camada de service worker antes de ir para o totem — não é uma simples recópia de arquivos |
 | Cache do service worker desatualizado (bug comum em PWA sobre SPA React) | Totem mostrar tela antiga mesmo após atualização do código | Disciplina de versionamento de cache no service worker |
-| Acesso de provisionamento aos tablets (side-load de app como o Fully Kiosk Browser, ou reset de fábrica para Device Owner) ainda não confirmado | Pode inviabilizar a opção de lockdown escolhida depois que o desenvolvimento já tiver começado | Confirmar com a contratante o nível de acesso administrativo aos tablets antes de travar a decisão de lockdown |
+| Time do Lovable ainda ajustando o formulário final, sem ETA confirmado | Pode atrasar a integração da camada offline com o código definitivo | Ver detalhamento e plano de contingência em [Plano de Implementação e Cronograma](/plano-e-cronograma) |

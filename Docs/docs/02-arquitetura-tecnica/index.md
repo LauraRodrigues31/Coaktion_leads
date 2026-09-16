@@ -43,16 +43,20 @@ rede.
   totem detectar conexão, mais um botão manual de "sincronizar agora"
   como fallback — o evento `online` do navegador sozinho não é 100%
   confiável para detectar conectividade real.
-- **Reset entre atendimentos:** reload automático do formulário após
-  alguns segundos de inatividade, para voltar ao estado inicial entre
-  uma pessoa e a próxima. Isso funciona independente de qualquer decisão
-  de lockdown do sistema (veja a árvore de decisão na seção
-  [Riscos e Contingência](/riscos-e-contingencia)).
-- **Bloqueio de tela:** *se* for confirmado que o totem vai ficar sem
-  supervisão humana constante, usar o app Fully Kiosk Browser
-  (~R$45–70 por licença, dois totens) para travar a tela no formulário.
-  Essa é uma dependência condicional, não uma decisão já tomada — está
-  documentada como item em aberto na seção de riscos.
+- **Reset entre atendimentos:** já é resolvido pelo próprio fluxo da
+  landing page, não pelo PWA. A pessoa completa o formulário, vê a tela
+  final de prêmios, e a equipe de marketing aperta um botão de
+  "recomeçar" (já existente na LP) que volta para a tela inicial. Não
+  há reset automático por inatividade a implementar — isso é
+  responsabilidade do fluxo já entregue pelo time de design, não deste
+  projeto.
+- **Bloqueio de tela:** **não é necessário.** A contratante confirmou
+  que o totem terá sempre alguém da equipe de marketing por perto,
+  controlando o reset entre atendimentos manualmente. Sem esse cenário
+  de operação desassistida, nenhum lockdown de sistema (Fully Kiosk
+  Browser ou Device Owner) é requisito — rodar em modo normal do Chrome
+  Android é suficiente. Detalhes da decisão em
+  [Riscos e Contingência](/riscos-e-contingencia).
 
 **Trade-offs:** reaproveita cerca de 95% do código existente sem mexer na
 UI. Em compensação, qualquer rebuild/reexport feito no Lovable precisa
@@ -70,10 +74,16 @@ SQLite em vez de IndexedDB/Dexie, e sincronização em background quando
 detectar internet.
 
 **Trade-offs:** exige montar um pipeline de build Android (Android
-Studio/Gradle) — complexidade nova para os 6 dias de prazo. Só compensa
-o esforço extra se a decisão de lockdown via Device Owner (bloqueio mais
-robusto que o Fully Kiosk Browser, mas que exige resetar o tablet de
-fábrica para provisionar) for confirmada como necessária.
+Studio/Gradle) — complexidade nova para os 6 dias de prazo. Como ficou
+confirmado que o totem sempre vai ter supervisão humana (ver
+[Riscos e Contingência](/riscos-e-contingencia)), o motivo original para
+considerar essa opção — viabilizar lockdown via Device Owner — deixou de
+se aplicar neste projeto. Ainda assim, a Opção 2 **continua
+tecnicamente disponível** caso a contratante prefira, agora ou em
+eventos futuros, um app nativo instalável em vez de um PWA — por
+motivos como ícone na tela, sensação de "app de verdade", ou
+gerenciamento do tablet como dispositivo dedicado. Isso é uma decisão
+dela, não uma eliminação técnica da opção.
 
 ### Comparativo
 
@@ -83,9 +93,9 @@ fábrica para provisionar) for confirmada como necessária.
 | Modificação do código existente | Mínima — camada de service worker + armazenamento, sem tocar na UI | Empacotamento completo do app; possível ajuste de APIs web → nativas |
 | Armazenamento local | Dexie.js (IndexedDB) | SQLite |
 | Risco de perda de dados | Baixo, mas depende de disciplina de versionamento de cache do service worker | Baixo — storage nativo mais previsível |
-| Lockdown de tela suportado | Fully Kiosk Browser (app de terceiros, licenciado) | Device Owner + Lock Task mode (nativo Android, mais robusto) |
-| Pré-requisito de provisionamento | Nenhum além de instalar o Fully Kiosk Browser, se necessário | Reset de fábrica dos tablets para configurar Device Owner |
-| Quando compensa | Cenário padrão — recomendado para este prazo | Só se o lockdown via Device Owner for confirmado como necessário |
+| Lockdown de tela suportado | Fully Kiosk Browser (app de terceiros, licenciado) — não requisitado neste projeto | Device Owner + Lock Task mode (nativo Android, mais robusto) — não requisitado neste projeto |
+| Pré-requisito de provisionamento | Nenhum | Reset de fábrica dos tablets para configurar Device Owner |
+| Quando compensa | Cenário recomendado para este prazo e operação (sempre supervisionado, reset manual pela equipe) | Se a contratante preferir app nativo instalável em vez de PWA — por motivos além de lockdown, como ícone na tela ou gestão como dispositivo dedicado |
 
 ## Diagramas
 

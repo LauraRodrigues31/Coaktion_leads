@@ -61,16 +61,24 @@ Chrome): a solução inteira roda dentro do navegador mobile.
 
 ## Reset entre atendimentos
 
-- O formulário recarrega automaticamente após alguns segundos de
-  inatividade, voltando ao estado inicial para a próxima pessoa.
-  **Por quê:** garante um reset consistente entre atendimentos
-  independentemente de qualquer decisão de lockdown do sistema (ver
-  árvore de decisão em [Riscos e Contingência](/riscos-e-contingencia)).
+O reset entre uma pessoa e a próxima **não é implementado por este
+projeto**. A contratante confirmou que o totem sempre terá alguém da
+equipe de marketing por perto: a pessoa completa o formulário, vê a
+tela final de prêmios, e a equipe aperta um botão de "recomeçar" já
+existente no fluxo da LP, que volta para a tela inicial. É reset manual,
+acionado por humano, coberto pelo próprio time de design — não algo
+que precisa ser construído aqui (ver decisão em
+[Riscos e Contingência](/riscos-e-contingencia)).
 
 ## Stack alternativa (Opção 2 — Capacitor)
 
-Caso a decisão de lockdown exija Device Owner + Lock Task mode (ver
-[Riscos e Contingência](/riscos-e-contingencia)), a stack muda para:
+A Opção 1 (PWA + Dexie.js) já resolve o projeto sem necessidade de
+lockdown de sistema, já que o totem sempre terá supervisão humana (ver
+[Riscos e Contingência](/riscos-e-contingencia)). A Opção 2 continua
+disponível como alternativa caso a contratante prefira, agora ou em
+eventos futuros, um app nativo instalável em vez de um PWA — por
+exemplo por querer ícone na tela ou gerenciar o tablet como dispositivo
+dedicado. Nesse caso, a stack muda para:
 
 - **Empacotamento:** [Capacitor](https://capacitorjs.com/), gerando um
   `.apk` instalável a partir do mesmo código React.

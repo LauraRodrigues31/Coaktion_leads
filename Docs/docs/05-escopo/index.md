@@ -18,16 +18,15 @@ sidebar_position: 1
   fallback.
 - Configuração de `totem_id` fixo em cada um dos 2 totens, para
   rastrear a origem do lead e evitar conflito de dados na sincronização.
-- Reset automático do formulário após período de inatividade, para
-  voltar ao estado inicial entre atendimentos.
 - Botão de exportação manual em CSV como rede de segurança, para backup
   via pendrive.
 - Testes no hardware físico dos dois totens antes do evento.
-- **Escopo condicional:** configuração de lockdown de tela (Fully Kiosk
-  Browser ou Device Owner + Lock Task mode) — depende da resposta ainda
-  pendente sobre supervisão constante do totem durante o evento. Ver a
-  árvore de decisão completa em
-  [Riscos e Contingência](/riscos-e-contingencia).
+
+Não entram configuração de lockdown de tela (Fully Kiosk Browser ou
+Device Owner) nem reset automático por inatividade: a contratante
+confirmou que o totem sempre terá supervisão humana, com reset manual
+já coberto pelo próprio fluxo da LP. Ver
+[Riscos e Contingência](/riscos-e-contingencia).
 
 ## Fica de fora desta primeira versão
 
@@ -37,12 +36,27 @@ sidebar_position: 1
   funcionar offline.
 - Sincronização em tempo real ou via dados móveis durante o evento — a
   sincronização acontece só ao final, quando o totem pegar Wi-Fi.
-- Empacotamento nativo via Capacitor (Opção 2 da arquitetura) — só entra
-  em escopo se a decisão de lockdown exigir Device Owner + Lock Task
-  mode.
+- Empacotamento nativo via Capacitor (Opção 2 da arquitetura) — não é
+  necessário para esta v1, mas segue disponível caso a contratante
+  prefira um app nativo instalável por outros motivos. Ver
+  [Arquitetura Técnica](/arquitetura-tecnica).
 
-> Itens acima refletem o que já foi decidido até aqui. Pontos de
-> escopo ainda não cobertos pela conversa (ex: dashboard de
-> acompanhamento pós-evento, deduplicação de leads entre os dois totens
-> além do `totem_id`, distribuição via loja de apps) ficam marcados como
-> a confirmar — sinaliza se algum desses deve entrar.
+## Trabalhos futuros / expansão para próximos eventos
+
+Itens que surgiram na conversa mas não foram pedidos explicitamente
+pela contratante para esta v1. Ficam registrados aqui como possíveis
+iterações futuras, não como escopo ativo:
+
+- **Dashboard de acompanhamento pós-evento** — visualização dos leads
+  capturados e da performance de cada totem, além da tabela crua no
+  Supabase.
+- **Deduplicação de leads entre os dois totens** além do que o
+  `totem_id` já resolve (rastreio de origem) — ex: identificar a mesma
+  pessoa cadastrada duas vezes em totens diferentes.
+- **Distribuição via loja de apps** (Google Play) — relevante só se o
+  projeto migrar para a Opção 2 (Capacitor) como app nativo distribuído
+  oficialmente, em vez de instalação direta do `.apk`.
+
+**Regra geral para o restante da documentação:** qualquer item que não
+foi pedido explicitamente pela contratante entra aqui, não no escopo
+ativo da v1.
