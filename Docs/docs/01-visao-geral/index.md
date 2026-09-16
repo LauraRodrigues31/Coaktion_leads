@@ -1,9 +1,12 @@
 ---
 sidebar_position: 1
-slug: /
+slug: /visao-geral
 ---
 
 # Visão Geral
+
+**Proposta elaborada por Laura Rodrigues** —
+[laura.rodrigues@sou.inteli.edu.br](mailto:laura.rodrigues@sou.inteli.edu.br)
 
 ## Resumo executivo
 
@@ -14,8 +17,9 @@ Este projeto substitui essa dependência por uma solução que roda
 offline: o mesmo formulário React que o time de design/marketing já
 entrega pronto passa a funcionar sem depender de conexão durante o
 evento, salvando cada lead localmente no próprio tablet e sincronizando
-com o Supabase só no fim, quando o totem pegar qualquer Wi-Fi
-disponível.
+com o Supabase (o banco de dados na nuvem que já guarda os dados da
+landing page online hoje) só no fim, quando o totem pegar qualquer
+Wi-Fi disponível.
 
 O ganho é duplo, com peso igual entre os dois lados: **economia direta**
 de não precisar contratar Wi-Fi dedicado para o evento, e **autonomia e
@@ -36,14 +40,23 @@ neste projeto.
 ## A solução proposta
 
 O mesmo código React da landing page (feito no Lovable, com Supabase
-como backend) passa a rodar como um PWA (Progressive Web App) dentro do
-Chrome do Android nos totens, com uma camada de Service Worker e
-armazenamento local (Dexie.js) que permite capturar e guardar cada lead
-diretamente no tablet, sem depender de internet durante o evento. Ao
-final do evento, quando o totem tiver acesso a qualquer Wi-Fi, os leads
-são sincronizados em lote com a mesma tabela do Supabase que a LP
-online já usa — sem necessidade de Wi-Fi dedicado nem de tempo real
-durante os dois dias de captação.
+como back-end — a parte do sistema que guarda e processa os dados por
+trás da tela que a pessoa vê) passa a rodar como um
+[PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+(Progressive Web App — um site que se comporta como um aplicativo
+instalado, inclusive funcionando sem internet) dentro do Chrome do
+Android nos totens, com uma camada de
+[Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+(um script que guarda os arquivos do site no próprio tablet, para ele
+abrir sem precisar baixar tudo de novo) e armazenamento local
+([Dexie.js](https://dexie.org/docs/) — uma forma de guardar os dados
+direto no tablet, sem depender de conexão) que permite capturar e
+guardar cada lead diretamente no aparelho, sem depender de internet
+durante o evento. Ao final do evento, quando o totem tiver acesso a
+qualquer Wi-Fi, os leads são sincronizados em lote (enviados todos de
+uma vez, em bloco) com a mesma tabela do Supabase que a LP online já
+usa — sem necessidade de Wi-Fi dedicado nem de tempo real durante os
+dois dias de captação.
 
 Detalhes técnicos completos estão em
 [Arquitetura Técnica](/arquitetura-tecnica) e
@@ -56,3 +69,10 @@ maximizar a captação dentro do fluxo de aproximadamente 15 mil pessoas
 circulando pelo estande — ou seja, capturar o máximo possível de leads
 dentro desse fluxo, sem depender de infraestrutura de rede cara ou de
 um serviço de terceiros para isso.
+
+## Referências
+
+- [PWA (Progressive Web Apps) — MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+- [Service Worker API — MDN](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+- [Dexie.js — documentação oficial](https://dexie.org/docs/)
+- [Supabase — documentação oficial](https://supabase.com/docs)

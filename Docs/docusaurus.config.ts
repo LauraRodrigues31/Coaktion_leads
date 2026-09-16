@@ -14,9 +14,13 @@ const config: Config = {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
   },
 
-  // Documentação interna, servida localmente. Ajustar quando/se for publicada.
-  url: 'https://totemleads.local',
-  baseUrl: '/',
+  // Publicado via GitHub Pages a partir do repositório Coaktion_leads.
+  url: 'https://laurarodrigues31.github.io',
+  baseUrl: '/Coaktion_leads/',
+  organizationName: 'LauraRodrigues31',
+  projectName: 'Coaktion_leads',
+  deploymentBranch: 'gh-pages',
+  trailingSlash: false,
 
   onBrokenLinks: 'throw',
 
@@ -24,6 +28,36 @@ const config: Config = {
     defaultLocale: 'pt-BR',
     locales: ['pt-BR'],
   },
+
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
+
+  // Tipografia da identidade visual da LP (Coaktion · Conarec 2026): DM Sans + DM Serif Display.
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: 'anonymous',
+      },
+    },
+  ],
+  stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..900;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap',
+      type: 'text/css',
+    },
+  ],
 
   presets: [
     [
@@ -43,14 +77,11 @@ const config: Config = {
 
   themeConfig: {
     colorMode: {
-      respectPrefersColorScheme: true,
+      defaultMode: 'dark',
+      respectPrefersColorScheme: false,
     },
     navbar: {
       title: 'TotemLeads',
-      logo: {
-        alt: 'TotemLeads',
-        src: 'img/logo.svg',
-      },
       items: [
         {
           type: 'docSidebar',
@@ -63,7 +94,7 @@ const config: Config = {
     footer: {
       style: 'dark',
       links: [],
-      copyright: `TotemLeads — Proposta de projeto © ${new Date().getFullYear()}`,
+      copyright: `TotemLeads — Proposta de projeto por Laura Rodrigues © ${new Date().getFullYear()}`,
     },
     prism: {
       theme: prismThemes.github,
