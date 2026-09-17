@@ -4,10 +4,9 @@ sidebar_position: 1
 
 # Estimativa de Custo e Horas
 
-Esta seção cobre só o **custo técnico de ferramentas** usadas para
-construir o projeto. O **custo das horas de desenvolvimento** (o
-trabalho da Laura) fica em aberto — ainda não foi decidido, e não está
-incluído nos valores abaixo.
+Esta seção cobre o **custo técnico de ferramentas** usadas para
+construir o projeto e o **valor do trabalho de desenvolvimento** (o
+trabalho da Laura), fechado por escopo.
 
 ## Custo técnico (ferramentas)
 
@@ -25,15 +24,27 @@ incluído nos valores abaixo.
     (dentro do ciclo mensal da assinatura, que não é fracionável), o
     valor cobrado do cliente é o do mês cheio: **US$ 20 (~R$103)**.
 
-## Horas de desenvolvimento
+## Valor do trabalho de desenvolvimento
 
-Em aberto — a definir. Não há, até o momento, um valor de hora ou uma
-estimativa de total de horas fechada para este projeto.
+O valor é fechado por escopo, não por hora — cobre integralmente tudo o
+que está listado em [Escopo](/escopo) (v1): adaptação do React
+existente para offline, camada PWA/Service Worker, armazenamento local
+com Dexie.js, `totem_id` por totem, exportação CSV e testes em hardware
+físico nos dois totens.
+
+- **Valor:** R$2.800.
+- Esse valor já incorpora o custo técnico do Claude Code descrito
+  acima (~R$103), não é cobrado à parte.
+- Qualquer item listado em ["Fica de fora desta primeira
+  versão"](/escopo#fica-de-fora-desta-primeira-versão) (redesenho da
+  LP, sincronização automática, empacotamento nativo, lockdown de tela,
+  etc.) não está incluído neste valor e seria orçado separadamente, se
+  solicitado.
 
 ## Total da proposta
 
-Custo técnico de ferramentas (fechado) + horas de desenvolvimento (em
-aberto) = **valor final a combinar**.
+**R$2.800**, fechado, cobrindo ferramentas e desenvolvimento conforme o
+escopo definido.
 
 ## Referências
 
