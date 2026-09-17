@@ -19,19 +19,18 @@ internet durante o evento.
 No projeto Lovable já existe uma pasta `integrations/supabase` com
 `client.ts`, `client.server.ts` e `types.ts` — esse último deve listar o
 schema completo das tabelas, incluindo a de leads, que é a mesma tabela
-que vai receber os dados sincronizados dos totens.
+que vai receber os dados dos totens depois da importação manual do CSV
+exportado (ver [Como os dados saem do totem](#como-os-dados-saem-do-totem)
+abaixo — a contratante confirmou operação 100% offline, sem
+sincronização automática via rede).
 
 Os totens rodam Android 14 com o Google Chrome padrão (não é um app
 nativo do fabricante do hardware). São 2 totens, mesmo código nos dois,
 cada um com um `totem_id` fixo configurado na instalação para rastrear a
-origem do lead e evitar conflito na hora de sincronizar.
+origem do lead e evitar ambiguidade na hora de juntar os CSVs exportados
+dos dois totens.
 
-## Duas opções técnicas
-
-Avaliamos duas formas de fazer esse React existente funcionar offline.
-**A recomendação é a Opção 1.**
-
-### Opção 1 (recomendada): PWA sobre o código React existente
+## Como funciona
 
 O código do Lovable vira um
 [PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
@@ -49,14 +48,11 @@ para carregar sem rede.
   para guardar informações direto no aparelho), em vez de IndexedDB
   puro — reduz boilerplate e risco de bug dado o prazo curto do
   projeto.
-- **Sincronização:** envio em lote (batch — todos os registros de uma
-  vez, em bloco, em vez de um por um) para o Supabase quando o
-  totem detectar conexão, mais um botão manual de "sincronizar agora"
-  como fallback — o evento `online` do navegador sozinho não é 100%
-  confiável para detectar conectividade real. Esse é o Plano A de
-  sincronização; para o cenário em que não há Wi-Fi disponível em
-  nenhum momento, ver
-  [Plano de contingência sem conectividade](#plano-de-contingência-sem-conectividade)
+- **Saída de dados:** exportação em CSV e transferência física — **não
+  há sincronização automática via Wi-Fi com o Supabase.** A contratante
+  confirmou preferência por operação 100% offline, em vez de depender
+  de conexão em qualquer momento do evento. O passo a passo completo
+  está em [Como os dados saem do totem](#como-os-dados-saem-do-totem),
   logo abaixo.
 - **Reset entre atendimentos:** já é resolvido pelo próprio fluxo da
   landing page, não pelo PWA. A pessoa completa o formulário, vê a tela
@@ -70,14 +66,12 @@ para carregar sem rede.
   controlando o reset entre atendimentos manualmente. Sem esse cenário
   de operação desassistida, nenhum lockdown de sistema (travar o tablet
   em modo totem, sem acesso a mais nada — via
-  [Fully Kiosk Browser](https://www.fully-kiosk.com/en/) ou
-  [Device Owner](https://developer.android.com/work/dpc/dedicated-devices/lock-task-mode))
+  [Fully Kiosk Browser](https://www.fully-kiosk.com/en/), por exemplo)
   é requisito — rodar em modo normal do Chrome Android é suficiente.
   Detalhes da decisão em [Riscos e Contingência](/riscos-e-contingencia).
 
-O diagrama abaixo resume esse fluxo geral, da captura no totem até o
-ponto em que o sistema decide como os dados saem dali (Plano A ou
-Plano B, detalhados mais adiante):
+O diagrama abaixo resume o fluxo completo, da captura no totem até a
+importação manual no destino final — nenhuma etapa toca em rede:
 
 ```mermaid
 flowchart TD
@@ -87,9 +81,17 @@ flowchart TD
     (código existente do Lovable)"]
     C --> D[("Dexie.js / IndexedDB
     armazenamento local")]
-    D --> E{"Há Wi-Fi disponível?"}
-    E -->|Sim| F["Plano A: sync com Supabase"]
-    E -->|Não| G["Plano B: exportação CSV"]
+    D --> E["Botão 'Exportar CSV'
+    (acesso restrito à equipe)"]
+    E --> F["Arquivo CSV salvo na pasta
+    Downloads do tablet"]
+    F --> G["Copiado para pendrive
+    via app de Arquivos do Android"]
+    G --> H["Pendrive levado a um
+    computador"]
+    H --> I["Importação manual no
+    Supabase (ou aberto direto
+    no Excel/Google Sheets)"]
 ```
 
 **Trade-offs:** reaproveita cerca de 95% do código existente sem mexer na
@@ -100,106 +102,64 @@ de uma SPA React também exige disciplina de versionamento de cache
 (cache antigo servindo tela desatualizada é a forma mais comum desse
 tipo de bug).
 
-### Opção 2 (alternativa): empacotamento nativo com Capacitor
+## Como os dados saem do totem
 
-O mesmo código React é empacotado como um app Android instalável
-(`.apk` — o formato de arquivo instalável de aplicativos Android) via
-[Capacitor](https://capacitorjs.com/docs) (uma ferramenta que empacota
-um site feito em React como app nativo), com armazenamento local em
-SQLite (um banco de dados local usado dentro de apps nativos, cumprindo
-o mesmo papel que o IndexedDB cumpre no PWA), via o plugin
-[capacitor-community/sqlite](https://github.com/capacitor-community/sqlite),
-em vez de IndexedDB/Dexie, e sincronização em background quando detectar
-internet.
-Lockdown de sistema, se necessário no futuro, seria via
-[Device Owner / Lock Task mode](https://developer.android.com/work/dpc/dedicated-devices/lock-task-mode).
+A contratante confirmou preferência por operação 100% offline (ver
+[Riscos e Contingência](/riscos-e-contingencia) para a decisão
+completa) — o totem nunca tenta se conectar a nada pela rede. A saída
+dos dados é sempre manual, feita pela equipe, em duas partes: primeiro
+tirar o CSV de dentro do totem, depois levar esse arquivo até um
+computador.
 
-**Trade-offs:** exige montar um pipeline de build Android (Android
-Studio/Gradle) — complexidade nova para o prazo apertado do projeto. Como ficou
-confirmado que o totem sempre vai ter supervisão humana (ver
-[Riscos e Contingência](/riscos-e-contingencia)), o motivo original para
-considerar essa opção — viabilizar lockdown via Device Owner — deixou de
-se aplicar neste projeto. Ainda assim, a Opção 2 **continua
-tecnicamente disponível** caso a contratante prefira, agora ou em
-eventos futuros, um app nativo instalável em vez de um PWA — por
-motivos como ícone na tela, sensação de "app de verdade", ou
-gerenciamento do tablet como dispositivo dedicado. Isso é uma decisão
-dela, não uma eliminação técnica da opção.
+### 1. Gerar o arquivo CSV no totem
 
-### Comparativo
+Um botão discreto de exportação — no mesmo padrão do botão de
+"recomeçar" que já existe no código da LP (aperta e segura por ~1,5s,
+para não ser acionado sem querer pelo público) — fica disponível nos
+dois totens, fora da visão/alcance do fluxo normal do visitante.
 
-| Critério | Opção 1 — PWA (recomendada) | Opção 2 — Capacitor (nativo) |
-|---|---|---|
-| Esforço no prazo do projeto | Baixo — reaproveita ~95% do código, sem novo pipeline de build | Alto — exige montar build Android (Android Studio/Gradle) do zero |
-| Modificação do código existente | Mínima — camada de service worker + armazenamento, sem tocar na UI | Empacotamento completo do app; possível ajuste de APIs web → nativas |
-| Armazenamento local | Dexie.js (IndexedDB) | SQLite |
-| Risco de perda de dados | Baixo, mas depende de disciplina de versionamento de cache do service worker | Baixo — storage nativo mais previsível |
-| Lockdown de tela suportado | [Fully Kiosk Browser](https://www.fully-kiosk.com/en/) (app de terceiros, licenciado) — não requisitado neste projeto | [Device Owner + Lock Task mode](https://developer.android.com/work/dpc/dedicated-devices/lock-task-mode) (nativo Android, mais robusto) — não requisitado neste projeto |
-| Pré-requisito de provisionamento | Nenhum | Reset de fábrica dos tablets para configurar Device Owner |
-| Quando compensa | Cenário recomendado para este prazo e operação (sempre supervisionado, reset manual pela equipe) | Se a contratante preferir app nativo instalável em vez de PWA — por motivos além de lockdown, como ícone na tela ou gestão como dispositivo dedicado |
+Ao ser acionado:
 
-## Plano de contingência sem conectividade
+1. O app lê todos os registros daquele totem salvos no Dexie/IndexedDB.
+2. Monta um arquivo CSV com as colunas equivalentes à tabela de leads
+   do Supabase, incluindo o `totem_id` em cada linha.
+3. O Chrome Android salva esse arquivo automaticamente na pasta
+   **Downloads** do tablet — comportamento padrão do navegador para
+   qualquer download, sem precisar de nenhuma permissão especial.
 
-O Plano A cobre o caso comum: o totem pega Wi-Fi em algum momento do
-evento e sincroniza com o Supabase. Mas o cenário mais pessimista
-também precisa estar coberto — e se nenhum Wi-Fi estiver disponível
-para o totem em momento nenhum, nem no fim do evento?
+O nome do arquivo inclui o `totem_id` e a data (ex:
+`leads_totem-1_2026-09-18.csv`), para não misturar os dois totens na
+hora de juntar tudo depois.
 
-**Este Plano B não é a opção recomendada.** É a rede de segurança caso
-o Plano A falhe ou não seja viável no dia — o Plano A continua sendo o
-caminho preferido. E ele não exige nenhum código adicional além do que
-já estava planejado: a captura em si não muda em nada, porque os dados
-já são salvos localmente via Dexie/IndexedDB desde a Opção 1 (ver
-diagrama acima), independente de rede. O que muda é só a saída — em vez
-de ir pela rede até o Supabase, sai por um arquivo.
+### 2. Levar o arquivo até um computador
 
-### Plano A: sincronização automática (Wi-Fi disponível)
+1. A equipe conecta um pendrive ao totem — via USB-C direto, ou com um
+   adaptador OTG (USB-C para USB-A) se o pendrive for do tipo comum.
+   **Isso depende do totem físico ter uma porta USB acessível** — é uma
+   premissa a confirmar com a contratante (ver
+   [Riscos e Contingência](/riscos-e-contingencia)).
+2. Abre o app de **Arquivos** nativo do Android (vem instalado de
+   fábrica em qualquer Android 14), que enxerga tanto o armazenamento
+   interno do tablet quanto o pendrive conectado.
+3. Localiza o CSV na pasta Downloads e copia para o pendrive.
+4. Repete esse processo nos dois totens — resultando em dois arquivos
+   CSV separados, um por totem.
 
-Antes de contrastar com o Plano B, vale visualizar o fluxo completo do
-Plano A, incluindo o botão manual como fallback dentro dele mesmo:
+### 3. Importar os dados
 
-```mermaid
-flowchart TD
-    A["Registros pendentes no
-    Dexie/IndexedDB"] --> B{"Totem detecta Wi-Fi?
-    (evento 'online' + checagem real)"}
-    B -->|Detectou| C["Sync automático em lote
-    para o Supabase"]
-    B -->|Não detectou de forma confiável| D["Equipe aciona botão
-    'Sincronizar agora'"]
-    D --> C
-    C --> E{"Sync confirmado?"}
-    E -->|Sim| F["Registros marcados como
-    sincronizados"]
-    E -->|Falhou| G["Registros continuam
-    pendentes"]
-    G --> B
-```
+Com os dois CSVs em mãos, a equipe leva o pendrive até um computador e
+tem duas opções, sem precisar de nenhum código adicional:
 
-### Plano B: exportação CSV (sem Wi-Fi em nenhum momento)
+- **Abrir direto** no Excel ou Google Sheets, para conferência rápida
+  ou uso imediato.
+- **Importar no Supabase**, usando a função nativa de importação de CSV
+  do [Supabase Studio](https://supabase.com/docs/guides/database/import-data)
+  (o painel web do Supabase) direto na tabela de leads existente — sem
+  precisar escrever nenhum script, mesma tabela que a LP online já usa.
 
-O mesmo botão de exportar CSV (um arquivo de planilha simples, que abre
-direto no Excel ou Google Sheets) que já estava planejado como backup
-do Plano A é reaproveitado aqui — a diferença é só o destino do arquivo,
-que sai por transferência física em vez de ir para o Supabase pela
-rede:
-
-```mermaid
-flowchart LR
-    A[("Dexie/IndexedDB
-    dados já salvos localmente")] --> B["Botão 'Exportar CSV'
-    (já existente como backup)"]
-    B --> C["Arquivo CSV salvo no
-    armazenamento do tablet"]
-    C --> D["Transferência física
-    (cabo USB, pendrive, etc.)"]
-    D --> E["Abrir em Excel ou
-    Google Sheets"]
-```
-
-Nenhuma etapa desse fluxo toca em rede ou no Supabase — é a opção
-tecnicamente mais simples que existe, útil como garantia mesmo com o
-Plano A sendo o preferido.
+Nenhuma etapa desse fluxo toca em rede — é a opção tecnicamente mais
+simples que existe: sem checagem de conectividade, sem lógica de retry,
+sem estado de "pendente vs. sincronizado" para gerenciar ou depurar.
 
 ## Referências
 
@@ -208,7 +168,5 @@ Plano A sendo o preferido.
 - [IndexedDB API — MDN](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
 - [Dexie.js — documentação oficial](https://dexie.org/docs/)
 - [Supabase — documentação oficial](https://supabase.com/docs)
-- [Capacitor — documentação oficial](https://capacitorjs.com/docs)
-- [capacitor-community/sqlite — plugin de SQLite para Capacitor](https://github.com/capacitor-community/sqlite)
-- [Android Device Owner / Lock Task mode — developer.android.com](https://developer.android.com/work/dpc/dedicated-devices/lock-task-mode)
+- [Importação de dados via CSV no Supabase](https://supabase.com/docs/guides/database/import-data)
 - [Fully Kiosk Browser — site oficial](https://www.fully-kiosk.com/en/)

@@ -13,19 +13,20 @@ slug: /visao-geral
 Os totens hoje dependem de um serviço pago, próprio do evento, só para
 travar o tablet na landing page e capturar leads via formulário — o que
 exige contratar Wi-Fi dedicado para o evento, algo em torno de R$6.000.
-Este projeto substitui essa dependência por uma solução que roda
-offline: o mesmo formulário React que o time de design/marketing já
-entrega pronto passa a funcionar sem depender de conexão durante o
-evento, salvando cada lead localmente no próprio tablet e sincronizando
-com o Supabase (o banco de dados na nuvem que já guarda os dados da
-landing page online hoje) só no fim, quando o totem pegar qualquer
-Wi-Fi disponível.
+Este projeto substitui essa dependência por uma solução 100% offline,
+por preferência confirmada da equipe de marketing: o mesmo formulário
+React que o time de design/marketing já entrega pronto passa a
+funcionar sem depender de conexão em nenhum momento do evento, salvando
+cada lead localmente no próprio tablet. No fim do evento, os leads saem
+por exportação em CSV e transferência física (pendrive ou cabo USB) —
+sem nenhuma sincronização automática via Wi-Fi com o Supabase (o banco
+de dados na nuvem que já guarda os dados da landing page online hoje).
 
 O ganho é duplo, com peso igual entre os dois lados: **economia direta**
 de não precisar contratar Wi-Fi dedicado para o evento, e **autonomia e
-confiabilidade** — os totens deixam de depender de conexão contínua ou
-de um serviço de terceiros para captar e não perder nenhum lead durante
-os dois dias de evento.
+confiabilidade** — os totens não dependem de conexão nenhuma, em nenhum
+momento, para captar e não perder nenhum lead durante os dois dias de
+evento.
 
 ## O problema
 
@@ -51,12 +52,12 @@ Android nos totens, com uma camada de
 abrir sem precisar baixar tudo de novo) e armazenamento local
 ([Dexie.js](https://dexie.org/docs/) — uma forma de guardar os dados
 direto no tablet, sem depender de conexão) que permite capturar e
-guardar cada lead diretamente no aparelho, sem depender de internet
-durante o evento. Ao final do evento, quando o totem tiver acesso a
-qualquer Wi-Fi, os leads são sincronizados em lote (enviados todos de
-uma vez, em bloco) com a mesma tabela do Supabase que a LP online já
-usa — sem necessidade de Wi-Fi dedicado nem de tempo real durante os
-dois dias de captação.
+guardar cada lead diretamente no aparelho, sem depender de internet em
+nenhum momento do evento. Ao final do evento, os leads são exportados
+em CSV direto do tablet e transferidos fisicamente (pendrive ou cabo
+USB) para importação manual no Supabase ou em uma planilha — sem
+nenhuma sincronização automática via rede, por decisão confirmada da
+equipe de marketing.
 
 Detalhes técnicos completos estão em
 [Arquitetura Técnica](/arquitetura-tecnica) e

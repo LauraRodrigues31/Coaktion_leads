@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Stack e Decisões Técnicas
 
-Esta seção detalha as peças da stack recomendada (Opção 1 — PWA, ver
+Esta seção detalha as peças da stack (ver
 [Arquitetura Técnica](/arquitetura-tecnica)) e o porquê de cada escolha.
 
 ## Hardware e sistema operacional
@@ -36,12 +36,15 @@ Chrome): a solução inteira roda dentro do navegador mobile.
 
 - **Backend:** [Supabase](https://supabase.com/docs) (o banco de dados
   na nuvem que guarda e processa os dados por trás da tela que a
-  pessoa vê) — mesmo back-end já usado pela landing page online. O
-  projeto Lovable já tem a integração pronta em `integrations/supabase`
-  (`client.ts`, `client.server.ts`, `types.ts`), incluindo o schema da
-  tabela de leads. Sincronização feita via
-  [supabase-js](https://supabase.com/docs/reference/javascript/introduction)
-  (a biblioteca oficial para o código conversar com o Supabase).
+  pessoa vê) — mesmo back-end já usado pela landing page online, e
+  destino final dos leads depois do evento. O projeto Lovable já tem a
+  integração pronta em `integrations/supabase` (`client.ts`,
+  `client.server.ts`, `types.ts`), incluindo o schema da tabela de
+  leads, usado como referência para o CSV exportado bater com as
+  colunas certas na importação manual. **O totem em si não chama a API
+  do Supabase** — por decisão de operação 100% offline (ver
+  [Riscos e Contingência](/riscos-e-contingencia)), a única saída de
+  dados é o CSV, então o `supabase-js` não entra no app do totem.
 - **Armazenamento local:** [Dexie.js](https://dexie.org/docs/) — uma
   biblioteca que facilita usar o
   [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
@@ -52,26 +55,26 @@ Chrome): a solução inteira roda dentro do navegador mobile.
   projeto — Dexie já resolve várias arestas de API do IndexedDB puro que
   custariam tempo de debug que o prazo apertado não comporta.
 
-## Sincronização
+## Saída de dados
 
-- **Modo:** envio em lote (batch) para o Supabase quando o totem
-  detectar conexão — o evento não é em tempo real, já que a
-  sincronização só precisa acontecer no fim do evento (2 dias), quando
-  o totem pegar Wi-Fi.
-- **Fallback manual:** botão de "sincronizar agora" na interface.
-  **Por quê:** o evento `online` do navegador não é 100% confiável
-  sozinho para detectar conectividade real (pode disparar com Wi-Fi
-  conectado mas sem internet de fato, por exemplo).
-- **Rede de segurança adicional:** botão de exportação manual em CSV
-  (um arquivo de planilha simples, que abre direto no Excel ou Google
-  Sheets), para backup via pendrive caso algo dê errado antes da
-  sincronização final.
+- **Método único:** botão de exportação manual em CSV (um arquivo de
+  planilha simples, que abre direto no Excel ou Google Sheets), com
+  transferência física via pendrive para importação manual no Supabase
+  ou em uma planilha depois do evento. O passo a passo completo —
+  incluindo como o CSV sai da pasta Downloads do tablet até chegar num
+  computador — está em
+  [Como os dados saem do totem](/arquitetura-tecnica#como-os-dados-saem-do-totem).
+  **Por quê:** a contratante confirmou preferência por operação 100%
+  offline — nenhuma sincronização automática via Wi-Fi com o Supabase
+  entra nesta versão. Isso também simplifica a stack: sem checagem de
+  conectividade, sem lógica de retry, sem estado de "pendente vs.
+  sincronizado" para gerenciar.
 
 ## Identificação por totem
 
 - Cada totem tem um `totem_id` fixo, configurado na instalação.
-  **Por quê:** rastrear a origem de cada lead e evitar conflito de dados
-  ao sincronizar os dois totens com a mesma tabela no Supabase.
+  **Por quê:** rastrear a origem de cada lead e evitar ambiguidade na
+  hora de juntar os CSVs exportados dos dois totens.
 
 ## Reset entre atendimentos
 
@@ -84,43 +87,10 @@ acionado por humano, coberto pelo próprio time de design — não algo
 que precisa ser construído aqui (ver decisão em
 [Riscos e Contingência](/riscos-e-contingencia)).
 
-## Stack alternativa (Opção 2 — Capacitor)
-
-A Opção 1 (PWA + Dexie.js) já resolve o projeto sem necessidade de
-lockdown de sistema, já que o totem sempre terá supervisão humana (ver
-[Riscos e Contingência](/riscos-e-contingencia)). A Opção 2 continua
-disponível como alternativa caso a contratante prefira, agora ou em
-eventos futuros, um app nativo instalável em vez de um PWA — por
-exemplo por querer ícone na tela ou gerenciar o tablet como dispositivo
-dedicado. Nesse caso, a stack muda para:
-
-- **Empacotamento:** [Capacitor](https://capacitorjs.com/docs) (uma
-  ferramenta que empacota um site em React como app Android instalável),
-  gerando um `.apk` (o formato de arquivo instalável de aplicativos
-  Android) a partir do mesmo código React.
-- **Armazenamento local:** SQLite (um banco de dados local usado dentro
-  de apps nativos), via o plugin
-  [capacitor-community/sqlite](https://github.com/capacitor-community/sqlite),
-  em vez de Dexie/IndexedDB.
-- **Sincronização:** em background, quando detectar internet.
-- **Lockdown (se necessário no futuro):** trava o tablet em modo totem,
-  sem acesso a mais nada, via
-  [Android Device Owner / Lock Task mode](https://developer.android.com/work/dpc/dedicated-devices/lock-task-mode),
-  ou [Fully Kiosk Browser](https://www.fully-kiosk.com/en/) como
-  alternativa de terceiros licenciada.
-
-Detalhes de esforço e trade-offs dessa alternativa estão no comparativo
-da seção [Arquitetura Técnica](/arquitetura-tecnica).
-
 ## Referências
 
 - [Service Worker API — MDN](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
 - [PWA (Progressive Web Apps) — MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
 - [Supabase — documentação oficial](https://supabase.com/docs)
-- [supabase-js — referência da API](https://supabase.com/docs/reference/javascript/introduction)
 - [Dexie.js — documentação oficial](https://dexie.org/docs/)
 - [IndexedDB API — MDN](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
-- [Capacitor — documentação oficial](https://capacitorjs.com/docs)
-- [capacitor-community/sqlite — plugin de SQLite para Capacitor](https://github.com/capacitor-community/sqlite)
-- [Android Device Owner / Lock Task mode — developer.android.com](https://developer.android.com/work/dpc/dedicated-devices/lock-task-mode)
-- [Fully Kiosk Browser — site oficial](https://www.fully-kiosk.com/en/)

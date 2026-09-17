@@ -31,12 +31,13 @@ partir do início do projeto.
   cada lead direto no tablet) espelhando a tabela de leads. Testar
   captura e persistência local com dados de teste, sem depender do
   build final do Lovable.
-- **Sincronização:** implementar a sincronização em lote com o
-  [Supabase](https://supabase.com/docs) ao detectar conexão, o botão
-  manual de "sincronizar agora", a exportação em CSV (arquivo de
-  planilha que abre direto no Excel/Google Sheets), e a configuração
-  de `totem_id` por instalação. Testar contra o Supabase com dados de
-  teste.
+- **Saída de dados:** implementar a exportação em CSV (arquivo de
+  planilha que abre direto no Excel/Google Sheets) e a configuração de
+  `totem_id` por instalação. Sem sincronização automática via rede
+  nesta versão (operação 100% offline — ver
+  [Riscos e Contingência](/riscos-e-contingencia)), essa etapa fica bem
+  mais simples do que uma integração de sync: é só testar que o CSV sai
+  com os dados certos.
 
 ## Fase 2 — com hardware em mãos
 
@@ -44,16 +45,15 @@ partir do início do projeto.
   resolução no hardware físico, instalar o
   [PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
   (o app web que roda offline) nos dois totens, e rodar o primeiro
-  teste ponta a ponta (captura offline + sincronização) em cada um.
+  teste ponta a ponta (captura offline + exportação CSV) em cada um.
 - **Endurance e ajustes:** simular uso contínuo por período prolongado,
   visando a resistência das ~48h do evento, e corrigir bugs que só
   aparecem em hardware real. Revalidar o fluxo de reset manual pela
   equipe de marketing (botão "recomeçar" da própria LP).
 - **Ensaio final:** simulação completa do fluxo de 2 dias de evento:
-  captura, resets manuais, sincronização final. Checklist de
-  contingência (exportação CSV testada, botão de sincronização manual
-  testado) e handoff para a equipe de marketing sobre como usar esses
-  dois recursos.
+  captura, resets manuais, exportação CSV e transferência física
+  (pendrive/cabo USB) testadas ponta a ponta, e handoff para a equipe
+  de marketing sobre como usar esses recursos.
 
 ## Risco de cronograma
 
