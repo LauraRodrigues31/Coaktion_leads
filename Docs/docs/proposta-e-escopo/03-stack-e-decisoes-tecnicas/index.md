@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+slug: /stack-e-decisoes-tecnicas
 ---
 
 # Stack e Decisões Técnicas

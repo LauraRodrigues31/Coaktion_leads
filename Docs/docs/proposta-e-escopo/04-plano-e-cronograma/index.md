@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+slug: /plano-e-cronograma
 ---
 
 # Plano de Implementação e Cronograma

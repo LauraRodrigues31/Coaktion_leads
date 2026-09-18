@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+slug: /estimativa-custo-horas
 ---
 
 # Estimativa de Custo e Horas

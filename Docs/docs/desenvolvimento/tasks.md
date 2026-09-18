@@ -1,6 +1,6 @@
 # Tasks — Coaktion Conarec 2026 (totem offline)
 
-Checklist de execução. Complementa a proposta em [Docs](../01-visao-geral/index.md) (que é a
+Checklist de execução. Complementa a proposta em [Proposta e Escopo](/) (que é a
 versão pra contratante) — aqui é técnico e vai ficando marcado conforme a
 tarefa é feita. Conforme cada task avança, documentar decisões/aprendizados
 direto embaixo dela (ou num arquivo novo aqui em `Desenvolvimento/`, linkado
@@ -9,47 +9,34 @@ daqui).
 Convenção: `[ ]` a fazer, `[x]` feito. Tamanho aproximado entre parênteses
 (P/M/G) só como referência de fôlego pra encaixar na rotina, sem compromisso.
 
-## 0. Descobertas técnicas a validar antes de codar (bloqueantes de decisão, não de código)
+## 0. Decisões tomadas antes de codar
 
-Duas coisas que vi lendo o código atual e que não estão resolvidas na
-proposta — não decidi nada, só documentei o que achei:
-
-- [ ] **Geração do `ticket_code` é hoje 100% server-side.** O submit atual
-  chama `supabase.rpc("submit_experience", payload)` (ver
-  [index.tsx:142](https://github.com/LauraRodrigues31/Coaktion_leads/blob/main/Lovable_Coaktion/src/routes/index.tsx#L142)), que roda
-  no Postgres (`submit_experience` em
-  [20260909183811_...sql](https://github.com/LauraRodrigues31/Coaktion_leads/blob/main/Lovable_Coaktion/supabase/migrations/20260909183811_441a55fb-61a9-4e4b-84ef-3d49c86d8e36.sql#L73)),
-  gera o código via `next_ticket_code()` e insere direto na tabela `leads`.
-  Offline, isso não pode chamar Postgres — o código do ticket precisa ser
-  gerado no próprio tablet. Decisão a tomar: formato do código local (ex:
-  `totem_id` + contador local, ou `totem_id` + timestamp) que não colida
-  entre os dois totens.
-- [ ] **Retirada de mimo (`redeem_ticket` / painel `/admin`) hoje depende do
-  lead já estar no banco de dados do Lovable.** Ver
-  [admin.tsx:136-150](https://github.com/LauraRodrigues31/Coaktion_leads/blob/main/Lovable_Coaktion/src/routes/admin.tsx#L136-L150) —
-  a equipe digita o `ticket_code` no painel e ele busca na tabela `leads` do
-  banco do Lovable. Mas, no fluxo offline, o lead só chega nesse banco depois do
-  evento (import manual do CSV) — ver
-  [Como os dados saem do totem](../02-arquitetura-tecnica/index.md#como-os-dados-saem-do-totem).
-  **Pergunta que falta responder com a contratante:** a retirada do
-  mimo/voucher nos carrinhos de comida acontece *durante* o evento? Se sim,
-  como isso é validado sem rede — visualmente (a pessoa mostra a tela do
-  ticket) ou precisa de alguma lista/checagem que o painel atual não cobre
-  nesse cenário? Isso não está no escopo fechado (R$2.800 cobre só a camada
-  offline do totem) — mas se a resposta for "precisa validar digitalmente
-  durante o evento", é um requisito novo que muda a arquitetura e provavelmente
-  o valor.
+- [x] **Retirada do mimo/voucher: resolvido, sem validação digital.** Ao
+  terminar o formulário, a pessoa recebe da equipe, na mão, um voucher
+  impresso genérico (papel pré-impresso, igual para todos). O totem não
+  imprime nada e nada é validado por sistema durante o evento. Portanto o
+  painel `/admin` e a função `redeem_ticket` (que consultam o banco do
+  Lovable) não entram no fluxo offline do totem e não precisam ser tocados.
+  Decisão confirmada pela equipe de marketing.
+- [ ] **Geração do `ticket_code` precisa passar a ser local.** Hoje o submit
+  chama `supabase.rpc("submit_experience", payload)` (`src/routes/index.tsx`,
+  linha ~142), que gera o código no Postgres via `next_ticket_code()` e insere
+  na tabela `leads`. Offline isso não roda, então o código exibido na tela de
+  ticket passa a ser gerado no tablet. Como o voucher físico é o controle real,
+  o código serve só como identificação do lead: basta não colidir entre os
+  dois totens ao juntar os CSVs (ex: `totem_id` + contador local). Formato a
+  definir na task 3.
 
 ## Fase 1 — sem totem em mãos
 
 ### 1. Setup (P)
 
 - [ ] Confirmar acesso ao repo/export atual do Lovable (já em
-  [Lovable_Coaktion/](https://github.com/LauraRodrigues31/Coaktion_leads/tree/main/Lovable_Coaktion)).
+  `Lovable_Coaktion/`).
 - [ ] Rodar local (`bun install`, dev server) e validar que o fluxo atual
   (online, contra Supabase) funciona ponta a ponta com dados de teste.
 - [ ] Revisar schema completo da tabela `leads` em
-  [types.ts](https://github.com/LauraRodrigues31/Coaktion_leads/blob/main/Lovable_Coaktion/src/integrations/supabase/types.ts) — vai
+  `types.ts` — vai
   virar a base do schema Dexie no passo 3.
 
 ### 2. Shell PWA (M)
@@ -61,14 +48,14 @@ proposta — não decidi nada, só documentei o que achei:
 - [ ] Definir disciplina de versionamento de cache desde já (nome do cache
   com hash/versão do build) — é o bug mais comum de PWA sobre SPA React
   (cache velho servindo tela desatualizada), já mapeado em
-  [Riscos e Contingência](../06-riscos-e-contingencia/index.md).
+  [Riscos e Contingência](/riscos-e-contingencia).
 - [ ] Testar: abrir o app, desligar a rede (DevTools → offline), recarregar
   — tem que continuar funcionando.
 
 ### 3. Schema Dexie (M)
 
 - [ ] Criar schema Dexie espelhando a tabela `leads` (campos em
-  [types.ts:73-99](https://github.com/LauraRodrigues31/Coaktion_leads/blob/main/Lovable_Coaktion/src/integrations/supabase/types.ts#L73-L99)):
+  `types.ts:73-99`):
   `nome`, `empresa`, `cargo`, `email`, `telefone`, `consent`, `score_aktie`,
   `score_kompelys`, `empresa_principal`, `empresa_secundaria`,
   `dor_principal`, `dor_secundaria`, `perguntas_aktie_respondidas`,
@@ -76,14 +63,13 @@ proposta — não decidi nada, só documentei o que achei:
   `perfil_titulo`, `respostas` (json), `ticket_code`, `ticket_status`,
   `created_at` — **mais `totem_id`**, que não existe na tabela online hoje
   e é novo, só do totem.
-- [ ] Implementar geração local do `ticket_code` (depende da decisão do
-  item 0).
+- [ ] Implementar geração local do `ticket_code` (formato definido no item 0).
 - [ ] Hook/função `saveLeadLocal(payload)` equivalente ao que
   `submit_experience` faz hoje no Postgres, mas gravando no Dexie.
 
 ### 4. Ligar o formulário ao Dexie (M)
 
-- [ ] Em [index.tsx](https://github.com/LauraRodrigues31/Coaktion_leads/blob/main/Lovable_Coaktion/src/routes/index.tsx), trocar a
+- [ ] Em `index.tsx`, trocar a
   chamada `supabase.rpc("submit_experience", ...)` (linha 142) por
   `saveLeadLocal(payload)`.
 - [ ] Manter o mesmo contrato de retorno (`{ ticket_code }`) que a tela de
@@ -102,7 +88,7 @@ proposta — não decidi nada, só documentei o que achei:
 
 - [ ] Botão de exportação — mesmo padrão de "aperta e segura ~1,5s" do botão
   de recomeçar, fora do fluxo visível do visitante (ver
-  [Arquitetura Técnica](../02-arquitetura-tecnica/index.md#1-gerar-o-arquivo-csv-no-totem)).
+  [Arquitetura Técnica](/arquitetura-tecnica#1-gerar-o-arquivo-csv-no-totem)).
   Ao acionar: lê tudo do Dexie daquele totem, monta CSV com colunas
   equivalentes à tabela `leads` + `totem_id`, salva em Downloads (comportamento
   padrão do Chrome Android).
