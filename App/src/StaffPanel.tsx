@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { csvFileName, downloadCsv, leadsToCsv } from "@/lib/csv";
 import { countLeads, db } from "@/lib/db";
+import { PROPOSTA } from "@/lib/layout";
 import { setTotemId as saveTotemId, TOTEM_IDS, type TotemId } from "@/lib/totemId";
 
 /** Primeira abertura: a equipe escolhe se este aparelho é o Totem 1 ou o Totem 2. */
@@ -78,6 +79,7 @@ export function StaffPanel({
             <p className="text-muted-foreground">
               {totemId.replace("-", " ")} · {count ?? "…"} lead(s) salvos neste aparelho
             </p>
+            <p className="text-sm text-muted-foreground">Layout: {PROPOSTA ? "PROPOSTA (pesquisa)" : "ATUAL (Lovable)"}</p>
             <button
               onClick={() => void exportCsv()}
               className="action-gradient w-full rounded-full px-8 py-4 text-xl font-bold text-primary-foreground"

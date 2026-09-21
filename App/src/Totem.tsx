@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { PROPOSTA } from "@/lib/layout";
 import { saveLeadLocal } from "@/lib/db";
 import { getTotemId, type TotemId } from "@/lib/totemId";
 import { setupPwa } from "@/pwa";
@@ -149,17 +150,35 @@ export function Totem() {
     advance();
   }, [advance, contact, consent, reading, totemId]);
 
+  const contentPadding = !PROPOSTA || step.kind === "welcome"
+    ? "pt-[2vh] lg:pt-[3vh]"
+    : step.kind === "ticket"
+      ? "pt-[25dvh]" // 480 px de 1920
+      : "pt-[53.85dvh]"; // 1034 px de 1920
+
   if (!totemId) return <TotemSetup onChoose={setTotemId} />;
 
   return (
     <main className="totem-background relative flex h-[100dvh] flex-col overflow-hidden bg-background px-6 pt-5 lg:px-14 lg:pt-6">
-      <TopBar
-        onBack={stepIndex > 0 && step.kind !== "ticket" && !saving ? goBack : undefined}
-      />
+      {!PROPOSTA && (
+        <TopBar
+          onBack={stepIndex > 0 && step.kind !== "ticket" && !saving ? goBack : undefined}
+        />
+      )}
+      {PROPOSTA && step.kind === "welcome" && <TopBar />}
+      {PROPOSTA && stepIndex > 0 && step.kind !== "ticket" && !saving && (
+        <button
+          onClick={goBack}
+          aria-label="Voltar uma etapa"
+          className="tap-card absolute left-14 top-[83.33dvh] z-20 flex h-[72px] w-[72px] items-center justify-center text-[32px] text-muted-foreground"
+        >
+          ‹
+        </button>
+      )}
 
 
       <div className="flex min-h-0 flex-1 flex-col pb-40 lg:pb-44">
-        <div className="flex min-h-0 flex-1 items-start justify-center overflow-hidden pt-[2vh] lg:pt-[3vh]">
+        <div className={`flex min-h-0 flex-1 items-start justify-center overflow-hidden ${contentPadding}`}>
           <div className="w-full max-w-4xl px-2 pb-4">
             {step.kind === "welcome" && <Welcome onStart={() => advance()} />}
 
@@ -245,7 +264,9 @@ export function Totem() {
       <img
         src={endorsedLogo.url}
         alt="Aktie Now e Kompelys — parte da Coaktion Ecosystem"
-        className="absolute bottom-10 left-1/2 h-auto max-h-24 w-[70%] max-w-[25rem] -translate-x-1/2 object-contain lg:bottom-12 lg:max-h-28 lg:max-w-[30rem]"
+        className={`absolute left-1/2 h-auto max-h-24 w-[70%] max-w-[25rem] -translate-x-1/2 object-contain lg:max-h-28 lg:max-w-[30rem] ${
+          PROPOSTA && step.kind !== "welcome" ? "top-[7.3dvh]" : "bottom-10 lg:bottom-12"
+        }`}
       />
 
       {ack && (
