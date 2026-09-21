@@ -1,0 +1,177 @@
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/poppins/700.css";
+@import "@fontsource/poppins/800.css";
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system Coaktion · Conarec 2026
+ * Fundo preto profundo, auras em gradiente (verde Aktie Now, âmbar Kompelys,
+ * roxo/laranja Coaktion), cartões de canto arredondado e tipografia bold.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-verde: var(--verde);
+  --color-ambar: var(--ambar);
+  --color-roxo: var(--roxo);
+  --font-sans: "Poppins", system-ui, sans-serif;
+  --font-display: "Poppins", system-ui, sans-serif;
+  --font-serif: "Poppins", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 1.25rem;
+  --background: oklch(0.14 0.01 280);
+  --foreground: oklch(0.97 0.01 100);
+  --card: oklch(0.19 0.012 280);
+  --card-foreground: oklch(0.97 0.01 100);
+  --popover: oklch(0.19 0.012 280);
+  --popover-foreground: oklch(0.97 0.01 100);
+  --primary: oklch(0.85 0.19 133);
+  --primary-foreground: oklch(0.16 0.02 150);
+  --secondary: oklch(0.24 0.015 280);
+  --secondary-foreground: oklch(0.97 0.01 100);
+  --muted: oklch(0.24 0.015 280);
+  --muted-foreground: oklch(0.72 0.015 280);
+  --accent: oklch(0.8 0.16 78);
+  --accent-foreground: oklch(0.18 0.03 60);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.85 0.19 133);
+  --verde: oklch(0.85 0.19 133);
+  --ambar: oklch(0.8 0.16 78);
+  --roxo: oklch(0.55 0.19 300);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    overscroll-behavior: none;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+  }
+
+  input {
+    font-size: 1.25rem;
+  }
+}
+
+/* Fundo do painel físico: centro preto e luz ampla nas bordas. */
+@utility totem-background {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -8%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(42% 18% at 92% 2%, oklch(0.8 0.16 78 / 60%), transparent 72%),
+      radial-gradient(38% 20% at 100% 17%, oklch(0.72 0.19 140 / 48%), transparent 74%),
+      radial-gradient(45% 22% at 0% 62%, oklch(0.8 0.16 78 / 48%), transparent 72%),
+      radial-gradient(48% 20% at 8% 76%, oklch(0.72 0.19 140 / 52%), transparent 74%);
+    filter: blur(34px);
+  }
+}
+
+@utility action-gradient {
+  background: linear-gradient(105deg, var(--color-ambar), var(--color-verde));
+  box-shadow: 0 12px 32px oklch(0.75 0.17 100 / 18%);
+  transition: transform 140ms ease, filter 140ms ease;
+  &:active {
+    transform: scale(0.985);
+    filter: brightness(0.94);
+  }
+}
+
+@utility tap-card {
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-border);
+  background: oklch(1 0 0 / 5%);
+  transition:
+    transform 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease;
+  &:active {
+    transform: scale(0.98);
+    background: oklch(1 0 0 / 10%);
+  }
+}
+
+@utility ticket-notch {
+  position: relative;
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: var(--color-background);
+    transform: translateY(-50%);
+  }
+  &::before {
+    left: -0.875rem;
+  }
+  &::after {
+    right: -0.875rem;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

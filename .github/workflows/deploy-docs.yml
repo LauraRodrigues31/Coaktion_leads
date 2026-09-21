@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'Docs/**'
+      - 'App/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -33,6 +34,16 @@ jobs:
       - name: Build
         working-directory: Docs
         run: npm run build
+      - name: Build totem app (PWA offline)
+        working-directory: App
+        env:
+          BASE_PATH: /Coaktion_leads/app/
+        run: |
+          npm ci
+          npm test
+          npm run build
+          mkdir -p ../Docs/build/app
+          cp -r dist/. ../Docs/build/app/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
