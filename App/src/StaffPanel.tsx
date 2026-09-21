@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { csvFileName, downloadCsv, leadsToCsv } from "@/lib/csv";
 import { countLeads, db } from "@/lib/db";
-import { PROPOSTA } from "@/lib/layout";
+import { PROPOSTA, STAFF_BUTTON_STYLE } from "@/lib/layout";
 import { setTotemId as saveTotemId, TOTEM_IDS, type TotemId } from "@/lib/totemId";
 
 /** Primeira abertura: a equipe escolhe se este aparelho é o Totem 1 ou o Totem 2. */
@@ -69,6 +69,8 @@ export function StaffPanel({
         onPointerDown={start}
         onPointerUp={cancel}
         onPointerLeave={cancel}
+        onContextMenu={(e) => e.preventDefault()}
+        style={STAFF_BUTTON_STYLE}
         aria-label="Painel da equipe"
         className={`fixed bottom-3 left-3 h-10 w-10 rounded-full transition-colors ${armed ? "bg-accent/70" : "bg-white/10"}`}
       />

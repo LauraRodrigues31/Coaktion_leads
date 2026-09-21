@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { PROPOSTA } from "@/lib/layout";
+import { PROPOSTA, STAFF_BUTTON_STYLE } from "@/lib/layout";
 import { saveLeadLocal } from "@/lib/db";
 import { getTotemId, type TotemId } from "@/lib/totemId";
 import { setupPwa } from "@/pwa";
@@ -749,6 +749,8 @@ function StaffReset({ onReset }: { onReset: () => void }) {
       onPointerDown={start}
       onPointerUp={cancel}
       onPointerLeave={cancel}
+      onContextMenu={(e) => e.preventDefault()}
+      style={STAFF_BUTTON_STYLE}
       aria-label="Reiniciar experiência (equipe)"
       className={`fixed bottom-3 right-3 h-10 w-10 rounded-full transition-colors ${
         armed ? "bg-accent/70" : "bg-white/10"
