@@ -1,0 +1,10 @@
+import { chromium } from "playwright-core";
+const browser = await chromium.launch({ executablePath: "/usr/bin/google-chrome", headless: true });
+const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+await page.goto("https://laurarodrigues31.github.io/Coaktion_leads/app/?totem=1", { timeout: 15000 });
+await page.waitForSelector("text=Toque na tela", { timeout: 10000 });
+const box = await page.getByLabel("Painel da equipe").boundingBox();
+await page.mouse.move(box.x + 5, box.y + 5);
+await page.mouse.down(); await page.waitForTimeout(1800); await page.mouse.up();
+console.log(await page.getByText(/Layout:/).textContent());
+await browser.close();

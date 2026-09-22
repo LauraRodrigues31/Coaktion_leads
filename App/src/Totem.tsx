@@ -267,7 +267,11 @@ export function Totem() {
         src={endorsedLogo.url}
         alt="Aktie Now e Kompelys — parte da Coaktion Ecosystem"
         className={`absolute left-1/2 h-auto max-h-24 w-[70%] max-w-[25rem] -translate-x-1/2 object-contain lg:max-h-28 lg:max-w-[30rem] ${
-          PROPOSTA && step.kind !== "welcome" ? "top-[7.3dvh]" : "bottom-10 lg:bottom-12"
+          PROPOSTA && step.kind !== "welcome"
+            ? "top-[7.3dvh]"
+            : CENTRO
+              ? "bottom-20 lg:bottom-24" // um pouco mais alta que o padrão — pedido da gerente, fora do grupo centralizado
+              : "bottom-10 lg:bottom-12"
         }`}
       />
 
