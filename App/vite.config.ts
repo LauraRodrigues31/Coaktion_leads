@@ -14,9 +14,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      // "prompt" evita trocar a tela no meio de um atendimento; a atualização
-      // é aplicada por src/pwa.ts quando o totem está na tela inicial.
-      registerType: "prompt",
+      // "autoUpdate": assim que o totem detecta uma versão nova (só acontece
+      // com internet), ela é aplicada na hora, sem depender de o totem estar
+      // parado numa tela específica. Simples e seguro aqui porque o totem só
+      // detecta atualização quando tem internet — e combinamos parar de
+      // publicar mudanças na véspera do evento, então em operação (offline)
+      // isso nunca dispara no meio de um atendimento.
+      registerType: "autoUpdate",
       injectRegister: false,
       manifest: {
         name: "Coaktion · Conarec 2026",

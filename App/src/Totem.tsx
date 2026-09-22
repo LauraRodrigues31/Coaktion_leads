@@ -21,9 +21,6 @@ const politicaPrivacidade = { url: asset("politica-de-privacidade-coaktion.pdf")
 const endorsedLogo = { url: asset("akite-kompelys-endorsed.webp") };
 const foodImage = { url: asset("mimos-gastronomicos.png") };
 
-// Usado pelo service worker para só atualizar o app na tela inicial.
-let atWelcome = true;
-
 interface ContactData {
   nome: string;
   empresa: string;
@@ -52,10 +49,9 @@ export function Totem() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const step = FLOW[stepIndex] as Step;
-  atWelcome = stepIndex === 0;
 
   useEffect(() => {
-    setupPwa(() => atWelcome);
+    setupPwa();
   }, []);
 
   const reset = useCallback(() => {
