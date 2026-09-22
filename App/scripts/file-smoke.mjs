@@ -1,0 +1,11 @@
+import { chromium } from "playwright-core";
+const browser = await chromium.launch({ executablePath: "/usr/bin/google-chrome", headless: true });
+const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+const errors = [];
+page.on("pageerror", (e) => errors.push(String(e)));
+page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+await page.goto("file://" + process.cwd() + "/dist-pendrive/index.html?totem=1&layout=centro");
+await page.waitForSelector("text=Toque na tela", { timeout: 8000 }).then(() => console.log("✓ abriu via file://")).catch(() => console.log("✗ não abriu"));
+await page.screenshot({ path: process.env.OUT + "/file-welcome.png" });
+console.log(errors.length ? "erros: " + errors.slice(0,5).join(" | ") : "✓ sem erros de console");
+await browser.close();

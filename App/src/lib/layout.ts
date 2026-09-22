@@ -1,7 +1,11 @@
-// Versão de teste com a proposta de ergonomia (?layout=proposta): só reposiciona
-// (conteúdo desce para a zona de toque, "Voltar" desce e cresce, logo sobe).
-// Medidas em % da altura da tela, tiradas da simulação em 1080×1920.
-export const PROPOSTA = new URLSearchParams(location.search).get("layout") === "proposta";
+// Qual layout mostrar (?layout=... na URL). Sem parâmetro = ATUAL (o do Lovable,
+// sem nenhuma mudança). "proposta" = sugestão da pesquisa de ergonomia (conteúdo
+// na zona de toque, 90–120 cm). "centro" = pedido da gerente de marketing: tudo
+// centralizado na tela, sem seguir a faixa de toque nem ficar no topo.
+const layoutParam = new URLSearchParams(location.search).get("layout");
+export const PROPOSTA = layoutParam === "proposta";
+export const CENTRO = layoutParam === "centro";
+export const LAYOUT_LABEL = CENTRO ? "CENTRALIZADO" : PROPOSTA ? "PROPOSTA (pesquisa)" : "ATUAL (Lovable)";
 
 // No Android, segurar o dedo abre o menu do Chrome (copiar, inspecionar...) e
 // cancela o toque; este estilo desliga esse menu e a seleção nos botões da equipe.
