@@ -25,6 +25,10 @@ describe("offline lead storage", () => {
     expect(lines[0].replace("﻿", "").split(",")).toEqual([...CSV_COLUMNS]);
     expect(csv).toContain('"Acme, ""Ltda"""');
     expect(csv).toContain("'=Bob");
+    // respostas é jsonb (lista de objetos), não text[] (lista de strings como
+    // mimos) — regressão real: virava literalmente "[object Object]" no CSV.
+    expect(csv).not.toContain("[object Object]");
+    expect(csv).toContain('[{""q"":""Q1"",""a"":""sim""}]');
   });
   it("rejeita lead sem nome", async () => {
     await expect(saveLeadLocal(payload(" "), "totem-1", new TotemDB("t2-" + Math.random()))).rejects.toThrow();

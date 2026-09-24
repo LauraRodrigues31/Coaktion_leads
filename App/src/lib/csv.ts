@@ -35,7 +35,11 @@ export const CSV_COLUMNS = [
 function cell(value: unknown): string {
   if (value === null || value === undefined) return "";
   let s: string;
-  if (Array.isArray(value)) s = `{${value.map((v) => `"${String(v).replace(/(["\\])/g, "\\$1")}"`).join(",")}}`; // text[] do Postgres
+  // text[] do Postgres (ex.: mimos) só quando é uma lista de valores simples.
+  // Uma lista de objetos (ex.: respostas, cada uma com pergunta/rótulo/pontuação)
+  // é jsonb, não text[] — precisa virar JSON de verdade, nunca "[object Object]".
+  const isSimpleArray = Array.isArray(value) && value.every((v) => v === null || typeof v !== "object");
+  if (isSimpleArray) s = `{${(value as unknown[]).map((v) => `"${String(v).replace(/(["\\])/g, "\\$1")}"`).join(",")}}`;
   else if (typeof value === "object") s = JSON.stringify(value);
   else s = String(value);
   // Neutraliza fórmulas de planilha (=, +, -, @) em texto digitado pelo visitante.
